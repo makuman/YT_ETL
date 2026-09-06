@@ -1,0 +1,9 @@
+Code snippet
+# Virtual Environment
+.venv/
+
+# Environment Variables & Secrets (API Keys)
+.env
+*.env
+
+__pycache__/
