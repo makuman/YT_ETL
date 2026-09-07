@@ -7,3 +7,5 @@ Code snippet
 *.env
 
 __pycache__/
+
+logs/
