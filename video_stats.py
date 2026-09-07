@@ -7,13 +7,13 @@ from datetime import date
 load_dotenv(dotenv_path="./.env")
 
 API_KEY = os.getenv("API_KEY")
-CHANNEL_HANDLER = "MrBeast"
+CHANNEL_HANDLE = os.getenv("CHANNEL_HANDLE")
 maxResults = 50
 
 def get_playlist_id():
 
     try: 
-        url = f"https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle={CHANNEL_HANDLER}&key={API_KEY}"
+        url = f"https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle={CHANNEL_HANDLE}&key={API_KEY}"
 
         response = requests.get(url)
 
