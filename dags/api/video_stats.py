@@ -1,15 +1,15 @@
 import requests
 import json
-import os
-from dotenv import load_dotenv
 from datetime import date
 
-load_dotenv(dotenv_path="./.env")
+from airflow.decorators import task
+from airflow.models import Variable
 
-API_KEY = os.getenv("API_KEY")
-CHANNEL_HANDLE = os.getenv("CHANNEL_HANDLE")
+API_KEY = Variable.get("API_KEY")
+CHANNEL_HANDLE = Variable.get("CHANNEL_HANDLE")
 maxResults = 50
 
+@task
 def get_playlist_id():
 
     try: 
@@ -33,9 +33,11 @@ def get_playlist_id():
     except requests.exceptions.RequestException as e:
         raise e
     
-
+@task
 def get_video_ids(playlistId):
+
     video_ids = []
+
     pageToken = None
 
     base_url = f"https://youtube.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults={maxResults}&playlistId={playlistId}&key={API_KEY}"
@@ -43,6 +45,7 @@ def get_video_ids(playlistId):
     try:
 
         while True:
+
             url = base_url
 
             if pageToken:
@@ -54,8 +57,8 @@ def get_video_ids(playlistId):
 
             data = response.json()
 
-            for item in data.get('items', []):
-                video_id = item['contentDetails']['videoId']
+            for item in data.get("items", []):
+                video_id = item["contentDetails"]["videoId"]
                 video_ids.append(video_id)
 
             pageToken = data.get("nextPageToken")
@@ -65,11 +68,10 @@ def get_video_ids(playlistId):
 
         return video_ids
 
-
     except requests.exceptions.RequestException as e:
         raise e
 
-
+@task
 def extract_video_data(video_ids):
 
     extracted_data = []
@@ -81,7 +83,7 @@ def extract_video_data(video_ids):
         for batch in batch_list(video_ids, maxResults):
             video_ids_str = ",".join(batch)
 
-            url = f"https://youtube.googleapis.com/youtube/v3/videos?part=contentDetails&part=snippet&part=statistics&id={video_ids_str}&key={API_KEY}"
+            url = f"https://youtube.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id={video_ids_str}&key={API_KEY}"
 
             response = requests.get(url)
 
@@ -105,13 +107,14 @@ def extract_video_data(video_ids):
                     "commentCount": statistics.get('commentCount', None),
                 }
 
-            extracted_data.append(video_data)
+                extracted_data.append(video_data)
 
         return extracted_data
             
     except requests.exceptions.RequestException as e:
         raise e
 
+@task
 def save_to_json(extracted_data):
     file_path = f"./data/YT_data_{date.today()}.json"
 

@@ -9,3 +9,5 @@ Code snippet
 __pycache__/
 
 logs/
+
+docker_run.txt
