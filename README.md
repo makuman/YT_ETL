@@ -33,8 +33,8 @@ and validates it with automated data-quality checks — all orchestrated with
 
 ```
                      ┌──────────────────────────────────────────────┐
-                     │              Apache Airflow                   │
-                     │        (CeleryExecutor + Redis)               │
+                     │              Apache Airflow                  │
+                     │        (CeleryExecutor + Redis)              |
                      └──────────────────────────────────────────────┘
 
   DAG 1: produce_json            DAG 2: update_db           DAG 3: data_quality
